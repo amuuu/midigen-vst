@@ -24,6 +24,7 @@ MidigenAudioProcessor::MidigenAudioProcessor()
                        )
 #endif
 {
+    addParameter(speed = new AudioParameterFloat("speed", "Arp Speed", 0.0, 1.0, 0.5));
 }
 
 MidigenAudioProcessor::~MidigenAudioProcessor()
@@ -97,6 +98,13 @@ void MidigenAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+
+    notes.clear();                          // [1]
+    currentNote = 0;                        // [2]
+    lastNoteValue = -1;                     // [3]
+    time = 0;                               // [4]
+    rate = static_cast<float> (sampleRate); // [5]
+    playbackSpeed = 0;
 }
 
 void MidigenAudioProcessor::releaseResources()
@@ -132,11 +140,51 @@ bool MidigenAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) 
 void MidigenAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
     buffer.clear();
-    int bpm = AudioPlayHead::getCurrentPosition(currentPositionInfo);
+    //int bpm = AudioPlayHead::getCurrentPosition(currentPositionInfo);
 
-    midiMessages.addEvent(MidiMessage::noteOn(1, 12, (juce::uint8)127), 0);
-    midiMessages.addEvent(MidiMessage::noteOff(1, 12), 1000);
+    //midiMessages.addEvent(MidiMessage::noteOn(1, 12, (juce::uint8)127), 0);
+    //midiMessages.addEvent(MidiMessage::noteOff(1, 12), 1000);
 
+    // the audio buffer in a midi effect will have zero channels!
+    //jassert(buffer.getNumChannels() == 0);
+
+    // however we use the buffer to get timing information
+    auto numSamples = buffer.getNumSamples();
+
+    // get note duration
+    auto noteDuration = static_cast<int> (std::ceil(rate * 0.25f * (0.1f + (1.0f - (*speed)))));
+
+    MidiMessage msg;
+    int ignore;
+
+    for (MidiBuffer::Iterator it(midiMessages); it.getNextEvent(msg, ignore);)
+    {
+        if (msg.isNoteOn())  notes.add(msg.getNoteNumber());
+        else if (msg.isNoteOff()) notes.removeValue(msg.getNoteNumber());
+    }
+
+    midiMessages.clear();
+
+    if ((time + numSamples) >= noteDuration)
+    {
+        auto offset = jmax(0, jmin((int)(noteDuration - time), numSamples - 1));
+
+        if (lastNoteValue > 0)
+        {
+            midiMessages.addEvent(MidiMessage::noteOff(1, lastNoteValue), offset);
+            lastNoteValue = -1;
+        }
+
+        if (notes.size() > 0)
+        {
+            currentNote = (currentNote + 1) % notes.size();
+            lastNoteValue = notes[currentNote];
+            midiMessages.addEvent(MidiMessage::noteOn(1, lastNoteValue, (uint8)127), offset);
+        }
+
+    }
+
+    time = (time + numSamples) % noteDuration;
 }
 
 //==============================================================================
