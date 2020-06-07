@@ -19,9 +19,8 @@ MidigenAudioProcessorEditor::MidigenAudioProcessorEditor (MidigenAudioProcessor&
     // editor's size to whatever you need it to be.
     setSize (600, 400);
 
-    // I added these:
 
-    // Arp Speed slider and label
+    //////////////// Arp Speed slider and label
     speedSlider.setRange(0.0, 1.0, 0.125);          // [1]
     speedSlider.setTextValueSuffix("");     // [2]
     speedSlider.addListener(this);
@@ -31,7 +30,7 @@ MidigenAudioProcessorEditor::MidigenAudioProcessorEditor (MidigenAudioProcessor&
     speedLabel.attachToComponent(&speedSlider, true); // [4]
     addAndMakeVisible(&speedLabel);
     
-    // Randomness slider and label
+    //////////////// Randomness slider and label
     randomnessSlider.setRange(0.0, 1.0, 0.02);
     randomnessSlider.setTextValueSuffix("%");
     randomnessSlider.addListener(this);
@@ -41,7 +40,7 @@ MidigenAudioProcessorEditor::MidigenAudioProcessorEditor (MidigenAudioProcessor&
     randomnessLabel.attachToComponent(&randomnessSlider, true);
     addAndMakeVisible(&randomnessLabel);
 
-    // Major and Minor buttons
+    //////////////// Major and Minor buttons
     addAndMakeVisible(&majorButton);
     addAndMakeVisible(&minorButton);
     majorButton.setClickingTogglesState(true);
@@ -53,11 +52,11 @@ MidigenAudioProcessorEditor::MidigenAudioProcessorEditor (MidigenAudioProcessor&
     minorButton.setRadioGroupId(ScaleButtons);
 
     addAndMakeVisible(&scaleTypeLabel);
+    scaleTypeLabel.setText("Scale Type", dontSendNotification);
     scaleTypeLabel.attachToComponent(&majorButton, true);
 
-    // Scale Name combobox
-    addAndMakeVisible(scaleNameLabel);
-    addAndMakeVisible(scaleNameMenu);
+    //////////////// Scale Name combobox
+    addAndMakeVisible(&scaleNameMenu);
     scaleNameMenu.addItem("C", 1);
     scaleNameMenu.addItem("C#", 2);
     scaleNameMenu.addItem("D", 3);
@@ -70,9 +69,26 @@ MidigenAudioProcessorEditor::MidigenAudioProcessorEditor (MidigenAudioProcessor&
     scaleNameMenu.addItem("A", 10);
     scaleNameMenu.addItem("Bb", 11);
     scaleNameMenu.addItem("B", 12);
-    
     scaleNameMenu.setSelectedId(1);
+    scaleNameMenu.onChange = [this] { scaleNameMenuChanged(); };
+
+    addAndMakeVisible(&scaleNameLabel);
+    scaleNameLabel.setText("Scale Name", dontSendNotification);
     scaleNameLabel.attachToComponent(&scaleNameMenu, true);
+
+    //////////////// Mode combobox
+    addAndMakeVisible(&modeMenu);
+    modeMenu.addItem("Notes", 1);
+    modeMenu.addItem("Chords", 2);
+    modeMenu.addItem("Notes+Chords", 3);
+    modeMenu.setSelectedId(1);
+    modeMenu.onChange = [this] { modeMenuChanged(); };
+
+    addAndMakeVisible(&modeLabel);
+    modeLabel.setText("Generating Mode", dontSendNotification);
+    modeLabel.attachToComponent(&modeMenu, true);
+
+
 
 }
 
@@ -107,8 +123,8 @@ void MidigenAudioProcessorEditor::resized()
 
     scaleNameMenu.setBounds(sliderLeft+230, 110, 60, 30);
 
+    modeMenu.setBounds(sliderLeft, 150, 130, 30);
 
- 
 }
 
 void MidigenAudioProcessorEditor::sliderValueChanged(Slider* slider)
@@ -128,4 +144,8 @@ void MidigenAudioProcessorEditor::updateScaleTypeToggleState(Button* button, Str
 
 void MidigenAudioProcessorEditor::scaleNameMenuChanged() {
     processor.scaleName = scaleNameMenu.getSelectedId();
+}
+
+void MidigenAudioProcessorEditor::modeMenuChanged() {
+    processor.mode = modeMenu.getSelectedId();
 }

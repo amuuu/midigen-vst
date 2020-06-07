@@ -27,10 +27,9 @@ public:
     void resized() override;
     void updateScaleTypeToggleState(Button* button, String name);
     void scaleNameMenuChanged();
-
+    void modeMenuChanged();
 
     enum RadioButtonIds { ScaleButtons = 1001 };
-    enum ScaleNames {A, Bb, C, Cs, D, Eb, E, F, Fs, G};
 
 private:
     // I added this:
@@ -47,12 +46,14 @@ private:
     Label randomnessLabel;
     Slider randomnessSlider;
 
-    Label scaleTypeLabel{ {}, "Scale Type" };
+    Label scaleTypeLabel;
     TextButton minorButton{ "Minor" }, majorButton{ "Major" };
 
-    Label scaleNameLabel{ {}, "Scale Name" };
+    Label scaleNameLabel;
     ComboBox scaleNameMenu;
 
+    Label modeLabel;
+    ComboBox modeMenu;
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidigenAudioProcessorEditor)

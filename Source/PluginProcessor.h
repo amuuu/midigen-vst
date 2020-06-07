@@ -60,6 +60,7 @@ public:
     float playbackSpeed;
     int scaleType; // 1:Major - 2:Minor
     int scaleName; 
+    int mode;
 
 private:
     //============================================================================== I ADDED THESE
