@@ -46,6 +46,9 @@ private:
     Label randomnessLabel;
     Slider randomnessSlider;
 
+    Label octaveNumbersLabel;
+    Slider octaveNumbersSlider;
+
     Label scaleTypeLabel;
     TextButton minorButton{ "Minor" }, majorButton{ "Major" };
 

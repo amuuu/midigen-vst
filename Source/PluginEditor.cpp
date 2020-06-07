@@ -17,17 +17,17 @@ MidigenAudioProcessorEditor::MidigenAudioProcessorEditor (MidigenAudioProcessor&
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (600, 400);
+    setSize (600, 250);
 
 
     //////////////// Arp Speed slider and label
-    speedSlider.setRange(0.0, 1.0, 0.125);          // [1]
-    speedSlider.setTextValueSuffix("");     // [2]
+    speedSlider.setRange(0.0, 1.0, 0.125);
+    speedSlider.setTextValueSuffix("");
     speedSlider.addListener(this);
     addAndMakeVisible(&speedSlider);
-    
+    speedSlider.setValue(1, dontSendNotification);
     speedLabel.setText("Speed", dontSendNotification);
-    speedLabel.attachToComponent(&speedSlider, true); // [4]
+    speedLabel.attachToComponent(&speedSlider, true);
     addAndMakeVisible(&speedLabel);
     
     //////////////// Randomness slider and label
@@ -35,10 +35,22 @@ MidigenAudioProcessorEditor::MidigenAudioProcessorEditor (MidigenAudioProcessor&
     randomnessSlider.setTextValueSuffix("%");
     randomnessSlider.addListener(this);
     addAndMakeVisible(&randomnessSlider);
-
+    randomnessSlider.setValue(1.0, dontSendNotification);
     randomnessLabel.setText("Randomness", dontSendNotification);
     randomnessLabel.attachToComponent(&randomnessSlider, true);
     addAndMakeVisible(&randomnessLabel);
+
+    //////////////// Octave Numbers slider and label
+    octaveNumbersSlider.setRange(1, 5, 1);
+    octaveNumbersSlider.setTextValueSuffix("");
+    octaveNumbersSlider.addListener(this);
+    octaveNumbersSlider.setValue(3, dontSendNotification);
+    addAndMakeVisible(&octaveNumbersSlider);
+
+    octaveNumbersLabel.setText("Octave Number", dontSendNotification);
+    octaveNumbersLabel.attachToComponent(&octaveNumbersSlider, true);
+    addAndMakeVisible(&octaveNumbersLabel);
+
 
     //////////////// Major and Minor buttons
     addAndMakeVisible(&majorButton);
@@ -112,7 +124,6 @@ void MidigenAudioProcessorEditor::resized()
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
 
-    // I added these:
     auto sliderLeft = 120;
 
     speedSlider.setBounds(sliderLeft, 20, getWidth() - sliderLeft - 10, 60);
@@ -125,11 +136,15 @@ void MidigenAudioProcessorEditor::resized()
 
     modeMenu.setBounds(sliderLeft, 150, 130, 30);
 
+    modeMenu.setBounds(sliderLeft, 150, 130, 30);
+    
+    octaveNumbersSlider.setBounds(sliderLeft, 180, getWidth() - sliderLeft - 10, 60);
 }
 
 void MidigenAudioProcessorEditor::sliderValueChanged(Slider* slider)
 {
     processor.playbackSpeed = speedSlider.getValue();
+    processor.octaveNumbers = octaveNumbersSlider.getValue();
 }
 
 

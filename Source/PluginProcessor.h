@@ -56,15 +56,24 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     //================================= I ADDED THIS:
-    float noteOnVel;
     float playbackSpeed;
     int scaleType; // 1:Major - 2:Minor
-    int scaleName; 
-    int mode;
+    int scaleName; //1c 2c# 3d 4eb 5e 6f 7f# 8g 9g# 10a 11bb 12b 
+    int mode; //1notes 2chords 3both
+
+    //=============================================================
+    int generateRandomNote();
+    int minMidiNoteValue;
+    int maxMidiNoteValue;
+    int octaveNumbers;
+    int majorScaleNotes[7];
+    int minorScaleNotes[7];
+
+    AudioParameterFloat* speed;
+
 
 private:
     //============================================================================== I ADDED THESE
-    AudioParameterFloat* speed;
     int currentNote, lastNoteValue;
     int time;
     float rate;

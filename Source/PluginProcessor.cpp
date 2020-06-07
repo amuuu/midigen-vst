@@ -99,12 +99,37 @@ void MidigenAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
 
-    notes.clear();                          // [1]
-    currentNote = 0;                        // [2]
-    lastNoteValue = -1;                     // [3]
-    time = 0;                               // [4]
-    rate = static_cast<float> (sampleRate); // [5]
-    playbackSpeed = 0;
+    notes.clear();                        
+    currentNote = 0;                      
+    lastNoteValue = -1;                  
+    time = 0;                               
+    rate = static_cast<float> (sampleRate);
+    
+    playbackSpeed = 1;
+    scaleType = 1;
+    scaleName = 1;
+    mode = 1;
+
+
+    minMidiNoteValue = 36; // C2
+    maxMidiNoteValue = 88; // C8
+    octaveNumbers = 3;
+    
+    majorScaleNotes[0] = 0;
+    majorScaleNotes[1] = 2;
+    majorScaleNotes[2] = 4;
+    majorScaleNotes[3] = 5;
+    majorScaleNotes[4] = 7;
+    majorScaleNotes[5] = 9;
+    majorScaleNotes[6] = 11;
+
+    minorScaleNotes[0] = 0;
+    minorScaleNotes[1] = 2;
+    minorScaleNotes[2] = 3;
+    minorScaleNotes[3] = 5;
+    minorScaleNotes[4] = 7;
+    minorScaleNotes[5] = 8;
+    minorScaleNotes[6] = 10;
 }
 
 void MidigenAudioProcessor::releaseResources()
@@ -151,17 +176,25 @@ void MidigenAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
     // however we use the buffer to get timing information
     auto numSamples = buffer.getNumSamples();
 
+    //speed->setValue(playbackSpeed);
+    
     // get note duration
-    auto noteDuration = static_cast<int> (std::ceil(rate * 0.25f * (0.1f + (1.0f - (*speed)))));
+    auto noteDuration = static_cast<int> (std::ceil(rate * 0.25f * (0.1f + (1.0f - (playbackSpeed)))));
 
     MidiMessage msg;
     int ignore;
 
-    for (MidiBuffer::Iterator it(midiMessages); it.getNextEvent(msg, ignore);)
+    /*for (MidiBuffer::Iterator it(midiMessages); it.getNextEvent(msg, ignore);)
     {
-        if (msg.isNoteOn())  notes.add(msg.getNoteNumber());
+        if (msg.isNoteOn())  notes.add(notes.add(generateRandomNote()));//msg.getNoteNumber());
         else if (msg.isNoteOff()) notes.removeValue(msg.getNoteNumber());
-    }
+    }*/
+    
+    
+    //notes.add(generateRandomNote());
+
+    //midiMessages.addEvent(MidiMessage::noteOn(1, generateRandomNote(), (uint8)127), 1);
+
 
     midiMessages.clear();
 
@@ -175,12 +208,12 @@ void MidigenAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
             lastNoteValue = -1;
         }
 
-        if (notes.size() > 0)
-        {
-            currentNote = (currentNote + 1) % notes.size();
-            lastNoteValue = notes[currentNote];
+        //if (notes.size() > 0)
+        //{
+            //currentNote = (currentNote + 1) % notes.size();
+            lastNoteValue = generateRandomNote();//notes[currentNote];
             midiMessages.addEvent(MidiMessage::noteOn(1, lastNoteValue, (uint8)127), offset);
-        }
+        //}
 
     }
 
@@ -212,6 +245,21 @@ void MidigenAudioProcessor::setStateInformation (const void* data, int sizeInByt
     // whose contents will have been created by the getStateInformation() call.
 }
 
+
+int MidigenAudioProcessor::generateRandomNote() {
+    
+    int note = 0;
+    int randomNote = Random::getSystemRandom().nextInt(6);
+    int randomOctave = Random::getSystemRandom().nextInt(octaveNumbers) + 1;
+    
+    switch (scaleType) {
+    case 1: note = majorScaleNotes[randomNote]; break;
+    case 2: note = minorScaleNotes[randomNote]; break;
+    }
+
+    note += minMidiNoteValue + randomOctave * 12;
+    return note;
+}
 //==============================================================================
 // This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
