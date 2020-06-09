@@ -43,11 +43,14 @@ private:
     Label speedLabel;
     Slider speedSlider;
 
-    Label randomnessLabel;
-    Slider randomnessSlider;
+    Label melodyRandomnessLabel;
+    Slider melodyRandomnessSlider;
 
     Label octaveNumbersLabel;
     Slider octaveNumbersSlider;
+
+    Label timeRandomnessLabel;
+    Slider timeRandomnessSlider;
 
     Label scaleTypeLabel;
     TextButton minorButton{ "Minor" }, majorButton{ "Major" };

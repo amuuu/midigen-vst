@@ -105,10 +105,12 @@ void MidigenAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     time = 0;                               
     rate = static_cast<float> (sampleRate);
     
-    playbackSpeed = 1;
+    playbackSpeed = 0.5;
     scaleType = 1;
     scaleName = 1;
     mode = 1;
+    timeRandomness = 0;
+    melodyRandomness = 0;
 
 
     minMidiNoteValue = 36; // C2
@@ -198,7 +200,7 @@ void MidigenAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
 
     midiMessages.clear();
 
-    if ((time + numSamples) >= noteDuration)
+    if ((time + numSamples) >= noteDuration + generateRandomTime())
     {
         auto offset = jmax(0, jmin((int)(noteDuration - time), numSamples - 1));
 
@@ -207,7 +209,6 @@ void MidigenAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
             midiMessages.addEvent(MidiMessage::noteOff(1, lastNoteValue), offset);
             lastNoteValue = -1;
         }
-
         //if (notes.size() > 0)
         //{
             //currentNote = (currentNote + 1) % notes.size();
@@ -254,11 +255,28 @@ int MidigenAudioProcessor::generateRandomNote() {
     
     switch (scaleType) {
     case 1: note = majorScaleNotes[randomNote]; break;
-    case 2: note = minorScaleNotes[randomNote]; break;
+    case 0: note = minorScaleNotes[randomNote]; break;
     }
 
-    note += minMidiNoteValue + randomOctave * 12;
+    note += minMidiNoteValue + scaleName + randomOctave * 12;
     return note;
+}
+
+int MidigenAudioProcessor::generateRandomTime() {
+    if (timeRandomness != 0) {
+        int choice = Random::getSystemRandom().nextInt(101);
+        float possibility = float(1 / (timeRandomness + 0.01));
+        if (possibility >= choice) {
+            return 0;
+        }
+        else {
+            return Random::getSystemRandom().nextInt(int(1 / timeRandomness)) % 100;
+        }
+    }
+    else {
+        return 0;
+    }
+
 }
 //==============================================================================
 // This creates new instances of the plugin..

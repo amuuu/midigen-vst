@@ -17,11 +17,11 @@ MidigenAudioProcessorEditor::MidigenAudioProcessorEditor (MidigenAudioProcessor&
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (600, 250);
+    setSize (600, 300);
 
 
     //////////////// Arp Speed slider and label
-    speedSlider.setRange(0.0, 1.0, 0.125);
+    speedSlider.setRange(0.0, 1.0, 0.0625);
     speedSlider.setTextValueSuffix("");
     speedSlider.addListener(this);
     addAndMakeVisible(&speedSlider);
@@ -30,15 +30,26 @@ MidigenAudioProcessorEditor::MidigenAudioProcessorEditor (MidigenAudioProcessor&
     speedLabel.attachToComponent(&speedSlider, true);
     addAndMakeVisible(&speedLabel);
     
-    //////////////// Randomness slider and label
-    randomnessSlider.setRange(0.0, 1.0, 0.02);
-    randomnessSlider.setTextValueSuffix("%");
-    randomnessSlider.addListener(this);
-    addAndMakeVisible(&randomnessSlider);
-    randomnessSlider.setValue(1.0, dontSendNotification);
-    randomnessLabel.setText("Randomness", dontSendNotification);
-    randomnessLabel.attachToComponent(&randomnessSlider, true);
-    addAndMakeVisible(&randomnessLabel);
+    
+    //////////////// Melody Randomness slider and label
+    melodyRandomnessSlider.setRange(0.0, 1.0, 0.02);
+    melodyRandomnessSlider.setTextValueSuffix("%");
+    melodyRandomnessSlider.addListener(this);
+    addAndMakeVisible(&melodyRandomnessSlider);
+    melodyRandomnessSlider.setValue(0.0, dontSendNotification);
+    melodyRandomnessLabel.setText("Melody Randomness", dontSendNotification);
+    melodyRandomnessLabel.attachToComponent(&melodyRandomnessSlider, true);
+    addAndMakeVisible(&melodyRandomnessLabel);
+
+    //////////////// Time Randomness slider and label
+    timeRandomnessSlider.setRange(0.0, 1.0, 0.02);
+    timeRandomnessSlider.setTextValueSuffix("%");
+    timeRandomnessSlider.addListener(this);
+    addAndMakeVisible(&timeRandomnessSlider);
+    timeRandomnessSlider.setValue(0.0, dontSendNotification);
+    timeRandomnessLabel.setText("Time Randomness", dontSendNotification);
+    timeRandomnessLabel.attachToComponent(&timeRandomnessSlider, true);
+    addAndMakeVisible(&timeRandomnessLabel);
 
     //////////////// Octave Numbers slider and label
     octaveNumbersSlider.setRange(1, 5, 1);
@@ -127,7 +138,8 @@ void MidigenAudioProcessorEditor::resized()
     auto sliderLeft = 120;
 
     speedSlider.setBounds(sliderLeft, 20, getWidth() - sliderLeft - 10, 60);
-    randomnessSlider.setBounds(sliderLeft, 50, getWidth() - sliderLeft - 10, 60);
+    
+    melodyRandomnessSlider.setBounds(sliderLeft, 50, getWidth() - sliderLeft - 10, 60);
     
     majorButton.setBounds(sliderLeft, 110, 60, 30);
     minorButton.setBounds(sliderLeft+65, 110, 60, 30);
@@ -139,28 +151,46 @@ void MidigenAudioProcessorEditor::resized()
     modeMenu.setBounds(sliderLeft, 150, 130, 30);
     
     octaveNumbersSlider.setBounds(sliderLeft, 180, getWidth() - sliderLeft - 10, 60);
+    
+    timeRandomnessSlider.setBounds(sliderLeft, 210, getWidth() - sliderLeft - 10, 60);
+
 }
 
 void MidigenAudioProcessorEditor::sliderValueChanged(Slider* slider)
 {
-    processor.playbackSpeed = speedSlider.getValue();
-    processor.octaveNumbers = octaveNumbersSlider.getValue();
+    if (slider == &speedSlider) {
+        processor.playbackSpeed = float(speedSlider.getValue());
+    }
+    else if (slider == &octaveNumbersSlider) {
+        processor.octaveNumbers = float(octaveNumbersSlider.getValue());
+    }
+    else if (slider == &timeRandomnessSlider) {
+        processor.timeRandomness = float(timeRandomnessSlider.getValue());
+    }
+    else if (slider == &melodyRandomnessSlider) {
+        // not implemented yet
+    }
 }
 
 
 void MidigenAudioProcessorEditor::updateScaleTypeToggleState(Button* button, String name)
 {
     auto state = button->getToggleState();
-    int scaleState = state ? 1 : 0;
+    String stateString = state ? "ON" : "OFF";
     //Logger::outputDebugString(name + " Button changed to " + scaleState);
-    processor.scaleType = scaleState;
-
+    
+    if (name == "Major" && stateString == "ON") {
+        processor.scaleType = 1;
+    }
+    else if (name=="Minor" && stateString == "ON") {
+        processor.scaleType = 0;
+    }
 }
 
 void MidigenAudioProcessorEditor::scaleNameMenuChanged() {
-    processor.scaleName = scaleNameMenu.getSelectedId();
+    processor.scaleName = int(scaleNameMenu.getSelectedId());
 }
 
 void MidigenAudioProcessorEditor::modeMenuChanged() {
-    processor.mode = modeMenu.getSelectedId();
+    processor.mode = int(modeMenu.getSelectedId());
 }
