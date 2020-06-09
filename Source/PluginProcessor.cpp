@@ -270,7 +270,7 @@ int MidigenAudioProcessor::generateRandomTime() {
             return 0;
         }
         else {
-            return Random::getSystemRandom().nextInt(int(1 / timeRandomness)) % 100;
+            return (Random::getSystemRandom().nextInt(5)+1);
         }
     }
     else {
