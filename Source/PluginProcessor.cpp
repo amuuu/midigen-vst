@@ -200,21 +200,19 @@ void MidigenAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer
 
     midiMessages.clear();
 
-    if ((time + numSamples) >= noteDuration + generateRandomTime())
+    if ((time + numSamples) >= noteDuration)
     {
         auto offset = jmax(0, jmin((int)(noteDuration - time), numSamples - 1));
 
-        if (lastNoteValue > 0)
-        {
+        if (lastNoteValue > 0) {
             midiMessages.addEvent(MidiMessage::noteOff(1, lastNoteValue), offset);
             lastNoteValue = -1;
         }
-        //if (notes.size() > 0)
-        //{
-            //currentNote = (currentNote + 1) % notes.size();
-            lastNoteValue = generateRandomNote();//notes[currentNote];
+
+        if (generateRandomSilence() != 0) {
+            lastNoteValue = generateRandomNote();
             midiMessages.addEvent(MidiMessage::noteOn(1, lastNoteValue, (uint8)127), offset);
-        //}
+        }
 
     }
 
@@ -262,16 +260,11 @@ int MidigenAudioProcessor::generateRandomNote() {
     return note;
 }
 
-int MidigenAudioProcessor::generateRandomTime() {
-    if (timeRandomness != 0) {
-        int choice = Random::getSystemRandom().nextInt(101);
-        float possibility = float(1 / (timeRandomness + 0.01));
-        if (possibility >= choice) {
-            return 0;
-        }
-        else {
-            return (Random::getSystemRandom().nextInt(5)+1);
-        }
+int MidigenAudioProcessor::generateRandomSilence() {
+    //float choice = float(1/float((Random::getSystemRandom().nextInt(100)+1)));
+    float choice = Random::getSystemRandom().nextFloat();
+    if ((timeRandomness == 0) || (timeRandomness >= choice)) {
+        return 1;
     }
     else {
         return 0;
