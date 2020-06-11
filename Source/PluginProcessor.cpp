@@ -99,8 +99,6 @@ void MidigenAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
 
-    notes.clear();                        
-    currentNote = 0;                      
     lastNoteValue = -1;                  
     time = 0;                               
     rate = static_cast<float> (sampleRate);
@@ -167,37 +165,9 @@ bool MidigenAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) 
 void MidigenAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
     buffer.clear();
-    //int bpm = AudioPlayHead::getCurrentPosition(currentPositionInfo);
 
-    //midiMessages.addEvent(MidiMessage::noteOn(1, 12, (juce::uint8)127), 0);
-    //midiMessages.addEvent(MidiMessage::noteOff(1, 12), 1000);
-
-    // the audio buffer in a midi effect will have zero channels!
-    //jassert(buffer.getNumChannels() == 0);
-
-    // however we use the buffer to get timing information
     auto numSamples = buffer.getNumSamples();
-
-    //speed->setValue(playbackSpeed);
-    
-    // get note duration
     auto noteDuration = static_cast<int> (std::ceil(rate * 0.25f * (0.1f + (1.0f - (playbackSpeed)))));
-
-    MidiMessage msg;
-    int ignore;
-
-    /*for (MidiBuffer::Iterator it(midiMessages); it.getNextEvent(msg, ignore);)
-    {
-        if (msg.isNoteOn())  notes.add(notes.add(generateRandomNote()));//msg.getNoteNumber());
-        else if (msg.isNoteOff()) notes.removeValue(msg.getNoteNumber());
-    }*/
-    
-    
-    //notes.add(generateRandomNote());
-
-    //midiMessages.addEvent(MidiMessage::noteOn(1, generateRandomNote(), (uint8)127), 1);
-
-
     midiMessages.clear();
 
     if ((time + numSamples) >= noteDuration)

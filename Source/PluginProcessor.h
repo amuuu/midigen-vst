@@ -73,13 +73,11 @@ public:
 
     AudioParameterFloat* speed;
 
-
 private:
     //============================================================================== I ADDED THESE
-    int currentNote, lastNoteValue;
+    int lastNoteValue;
     int time;
     float rate;
-    SortedSet<int> notes;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidigenAudioProcessor)
 };
