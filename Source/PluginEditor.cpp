@@ -17,7 +17,7 @@ MidigenAudioProcessorEditor::MidigenAudioProcessorEditor (MidigenAudioProcessor&
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (600, 300);
+    setSize (600, 250);
 
 
     //////////////// Arp Speed slider and label
@@ -32,14 +32,14 @@ MidigenAudioProcessorEditor::MidigenAudioProcessorEditor (MidigenAudioProcessor&
     
     
     //////////////// Melody Randomness slider and label
-    melodyRandomnessSlider.setRange(0.0, 1.0, 0.02);
+    /*melodyRandomnessSlider.setRange(0.0, 1.0, 0.02);
     melodyRandomnessSlider.setTextValueSuffix("%");
     melodyRandomnessSlider.addListener(this);
     addAndMakeVisible(&melodyRandomnessSlider);
     melodyRandomnessSlider.setValue(processor.melodyRandomness, dontSendNotification);
     melodyRandomnessLabel.setText("Melody Randomness", dontSendNotification);
     melodyRandomnessLabel.attachToComponent(&melodyRandomnessSlider, true);
-    addAndMakeVisible(&melodyRandomnessLabel);
+    addAndMakeVisible(&melodyRandomnessLabel);*/
 
     //////////////// Time Randomness slider and label
     timeRandomnessSlider.setRange(0.0, 1.0, 0.02);
@@ -57,7 +57,7 @@ MidigenAudioProcessorEditor::MidigenAudioProcessorEditor (MidigenAudioProcessor&
     octaveNumbersSlider.addListener(this);
     octaveNumbersSlider.setValue(processor.octaveNumbers, dontSendNotification);
     addAndMakeVisible(&octaveNumbersSlider);
-    octaveNumbersLabel.setText("Octave Number", dontSendNotification);
+    octaveNumbersLabel.setText("Octave Numbers", dontSendNotification);
     octaveNumbersLabel.attachToComponent(&octaveNumbersSlider, true);
     addAndMakeVisible(&octaveNumbersLabel);
 
@@ -95,18 +95,22 @@ MidigenAudioProcessorEditor::MidigenAudioProcessorEditor (MidigenAudioProcessor&
     scaleNameLabel.setText("Scale Name", dontSendNotification);
     scaleNameLabel.attachToComponent(&scaleNameMenu, true);
 
-    //////////////// Mode combobox
-    addAndMakeVisible(&modeMenu);
-    modeMenu.addItem("Notes", 1);
-    modeMenu.addItem("Chords", 2);
-    modeMenu.addItem("Notes+Chords", 3);
-    modeMenu.setSelectedId(processor.mode);
-    modeMenu.onChange = [this] { modeMenuChanged(); };
-    addAndMakeVisible(&modeLabel);
-    modeLabel.setText("Generating Mode", dontSendNotification);
-    modeLabel.attachToComponent(&modeMenu, true);
+    //////////////// Base Octave combobox
+    addAndMakeVisible(&baseOctaveMenu);
+    baseOctaveMenu.addItem("1", 1);
+    baseOctaveMenu.addItem("2", 2);
+    baseOctaveMenu.addItem("3", 3);
+    baseOctaveMenu.addItem("4", 4);
+    baseOctaveMenu.setSelectedId((processor.minMidiNoteValue)/12-1);
+    baseOctaveMenu.onChange = [this] { baseOctaveMenuChanged(); };
+    addAndMakeVisible(&baseOctaveLabel);
+    baseOctaveLabel.setText("Base Octave", dontSendNotification);
+    baseOctaveLabel.attachToComponent(&baseOctaveMenu, true);
 
-
+    //////////////// Credits Label
+    creditsLabel.setText("Created by AMU with <3 for free use. The source code is available on GitHub.", dontSendNotification);
+    creditsLabel.setFont(Font(9.0f, Font::italic));
+    addAndMakeVisible(&creditsLabel);
 
 }
 
@@ -133,22 +137,13 @@ void MidigenAudioProcessorEditor::resized()
     auto sliderLeft = 120;
 
     speedSlider.setBounds(sliderLeft, 20, getWidth() - sliderLeft - 10, 60);
-    
-    melodyRandomnessSlider.setBounds(sliderLeft, 50, getWidth() - sliderLeft - 10, 60);
-    
+    timeRandomnessSlider.setBounds(sliderLeft, 60, getWidth() - sliderLeft - 10, 60);
     majorButton.setBounds(sliderLeft, 110, 60, 30);
     minorButton.setBounds(sliderLeft+65, 110, 60, 30);
-
     scaleNameMenu.setBounds(sliderLeft+230, 110, 60, 30);
-
-    modeMenu.setBounds(sliderLeft, 150, 130, 30);
-
-    modeMenu.setBounds(sliderLeft, 150, 130, 30);
-    
-    octaveNumbersSlider.setBounds(sliderLeft, 180, getWidth() - sliderLeft - 10, 60);
-    
-    timeRandomnessSlider.setBounds(sliderLeft, 210, getWidth() - sliderLeft - 10, 60);
-
+    octaveNumbersSlider.setBounds(sliderLeft, 140, getWidth() - sliderLeft - 10, 60);
+    baseOctaveMenu.setBounds(sliderLeft, 190, 60, 30);
+    creditsLabel.setBounds(sliderLeft+172, 232, getWidth() - sliderLeft - 10, 20);
 }
 
 void MidigenAudioProcessorEditor::sliderValueChanged(Slider* slider)
@@ -162,9 +157,7 @@ void MidigenAudioProcessorEditor::sliderValueChanged(Slider* slider)
     else if (slider == &timeRandomnessSlider) {
         processor.timeRandomness = float(timeRandomnessSlider.getValue());
     }
-    else if (slider == &melodyRandomnessSlider) {
-        // not implemented yet
-    }
+    
 }
 
 
@@ -186,6 +179,6 @@ void MidigenAudioProcessorEditor::scaleNameMenuChanged() {
     processor.scaleName = int(scaleNameMenu.getSelectedId());
 }
 
-void MidigenAudioProcessorEditor::modeMenuChanged() {
-    processor.mode = int(modeMenu.getSelectedId());
+void MidigenAudioProcessorEditor::baseOctaveMenuChanged() {
+    processor.minMidiNoteValue = int(12*(int(baseOctaveMenu.getSelectedId())+1));
 }

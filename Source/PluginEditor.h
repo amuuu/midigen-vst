@@ -27,7 +27,8 @@ public:
     void resized() override;
     void updateScaleTypeToggleState(Button* button, String name);
     void scaleNameMenuChanged();
-    void modeMenuChanged();
+    void baseOctaveMenuChanged();
+
 
     enum RadioButtonIds { ScaleButtons = 1001 };
 
@@ -43,8 +44,8 @@ private:
     Label speedLabel;
     Slider speedSlider;
 
-    Label melodyRandomnessLabel;
-    Slider melodyRandomnessSlider;
+    //Label melodyRandomnessLabel;
+    //Slider melodyRandomnessSlider;
 
     Label octaveNumbersLabel;
     Slider octaveNumbersSlider;
@@ -58,9 +59,10 @@ private:
     Label scaleNameLabel;
     ComboBox scaleNameMenu;
 
-    Label modeLabel;
-    ComboBox modeMenu;
+    Label baseOctaveLabel;
+    ComboBox baseOctaveMenu;
     
+    Label creditsLabel;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidigenAudioProcessorEditor)
 };

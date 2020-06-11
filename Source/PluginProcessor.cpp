@@ -108,12 +108,9 @@ void MidigenAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     playbackSpeed = 0.5;
     scaleType = 1;
     scaleName = 1;
-    mode = 1;
     timeRandomness = 0;
-    melodyRandomness = 0;
 
-
-    minMidiNoteValue = 36; // C2
+    minMidiNoteValue = 36; // c2
     maxMidiNoteValue = 88; // C8
     octaveNumbers = 3;
     
@@ -132,6 +129,9 @@ void MidigenAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     minorScaleNotes[4] = 7;
     minorScaleNotes[5] = 8;
     minorScaleNotes[6] = 10;
+
+
+
 }
 
 void MidigenAudioProcessor::releaseResources()

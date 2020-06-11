@@ -59,8 +59,6 @@ public:
     float playbackSpeed;
     int scaleType; // 1:Major - 2:Minor
     int scaleName; //1c 2c# 3d 4eb 5e 6f 7f# 8g 9g# 10a 11bb 12b 
-    int mode; //1notes 2chords 3both
-    float melodyRandomness;
     float timeRandomness;
 
     //=============================================================
